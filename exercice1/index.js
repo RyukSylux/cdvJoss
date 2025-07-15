@@ -37,34 +37,36 @@ function demanderChoix() {
     rl.question('Votre choix : ', function(answer) {
         const operations = ['+', '-', '*', '/', '5'];
         answer = answer.trim();
-        if (operations.includes(answer)) {
-            if (answer === '5') {
-                console.log('Au revoir !');
-                rl.close();
-                return;
-            }
-
-            demanderNombres(answer);
-        } else {
+        if (!operations.includes(answer)) {
             console.log('Choix invalide. Veuillez réessayer.\n');
-            demanderChoix();
+            return demanderChoix();
         }
+
+        if (answer === '5') {
+            console.log('Allez degage !');
+            rl.close();
+            return;
+        }
+
+        demanderNombres(answer);
     });
+}
+
+function validerNombre(input) {
+    const n = parseFloat(input);
+    if (isNaN(n)) {
+        throw new Error('Entrée invalide : ce n\'est pas un nombre.');
+    }
+    return n;
 }
 
 function demanderNombres(choix) {
     rl.question('Entrez le premier nombre : ', function(input1) {
         rl.question('Entrez le deuxième nombre : ', function(input2) {
-            const a = parseFloat(input1);
-            const b = parseFloat(input2);
-
-            if (isNaN(a) || isNaN(b)) {
-                console.log('Entrée invalide. Veuillez entrer des nombres valides.\n');
-                demanderNombres(choix);
-                return;
-            }
-
             try {
+                const a = validerNombre(input1);
+                const b = validerNombre(input2);
+
                 let resultat;
 
                 switch (choix) {
@@ -82,11 +84,11 @@ function demanderNombres(choix) {
                         break;
                 }
 
-                console.log('Résultat : ', resultat);
+                console.log('Résultat :', resultat);
+                demanderChoix();
             } catch (err) {
-                console.log('Erreur :', err.message);
-            } finally {
-                rl.close();
+                console.error('Erreur :', err.message + '\n');
+                return demanderNombres(choix);
             }
         });
     });
